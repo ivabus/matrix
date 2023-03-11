@@ -1,0 +1,3 @@
+[workspace]
+members = ["matrix", "matrix_graphics"]
+resolver = "2"

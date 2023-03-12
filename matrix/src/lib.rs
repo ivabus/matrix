@@ -36,7 +36,7 @@ pub fn sum<T: Add<Output = T> + Copy>(a: &Matrix<T>, b: &Matrix<T>) -> Option<Ma
 	Some(c)
 }
 
-pub fn mul<T: Mul<Output = T> + Copy + AddAssign + MulAssign + std::fmt::Display + From<u8>>(
+pub fn mul<T: Mul<Output = T> + Copy + AddAssign + From<u8>>(
 	a: &Matrix<T>,
 	b: &Matrix<T>,
 ) -> Option<Matrix<T>> {
@@ -66,10 +66,7 @@ pub fn mul<T: Mul<Output = T> + Copy + AddAssign + MulAssign + std::fmt::Display
 }
 
 #[allow(dead_code)]
-fn gen_matrix<T: Mul<Output = T> + Copy + AddAssign + MulAssign + std::fmt::Display + From<i32>>(
-	i: usize,
-	j: usize,
-) -> Option<Matrix<T>> {
+fn gen_matrix<T: From<i32>>(i: usize, j: usize) -> Option<Matrix<T>> {
 	if !(i > 0 && j > 0) {
 		return None;
 	}
@@ -123,7 +120,7 @@ mod test {
 		let ab = mul(&a, &b);
 		let ba = mul(&b, &a);
 		if ab != None && ba != None {
-			assert!(ab.unwrap() == ba.unwrap())
+			assert_eq!(ab.unwrap(), ba.unwrap())
 		} else {
 			assert!(false)
 		}

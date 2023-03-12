@@ -5,7 +5,7 @@
 ## Contents
 
 - `matrix` - core lib (just matrix addition and multiplication)
-- `matrix_graphics` - using rotation matrix to rotate things )
+- `matrix_graphics` - using rotation matrix to rotate things (polygons by default)
 
 ## `matrix_graphics`
 
@@ -32,7 +32,8 @@ const CENTER_Y: u32 = 240;
 // center of polygon by Y
 const RADIUS: u32 = 100;
 // radius of polygon
-const DEFAULT_ANGLE: f64 = 0.; //default rotation angle (in radians)
+const DEFAULT_ANGLE: f64 = 0.;
+//default rotation angle (in radians)
 ```
 
 ### License

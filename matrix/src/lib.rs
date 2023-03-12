@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Mul, MulAssign};
+use std::ops::{Add, AddAssign, Mul};
 
 use rand::{thread_rng, Rng};
 
@@ -17,7 +17,7 @@ fn check_valid<T>(a: &Matrix<T>) -> bool {
 }
 
 pub fn sum<T: Add<Output = T> + Copy>(a: &Matrix<T>, b: &Matrix<T>) -> Option<Matrix<T>> {
-	if !(check_valid(&a) && check_valid(&b)) {
+	if !(check_valid(a) && check_valid(b)) {
 		return None;
 	}
 
@@ -40,7 +40,7 @@ pub fn mul<T: Mul<Output = T> + Copy + AddAssign + From<u8>>(
 	a: &Matrix<T>,
 	b: &Matrix<T>,
 ) -> Option<Matrix<T>> {
-	if !(check_valid(&a) && check_valid(&b)) {
+	if !(check_valid(a) && check_valid(b)) {
 		return None;
 	}
 

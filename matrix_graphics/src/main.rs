@@ -107,16 +107,13 @@ fn main() {
 	let mut bitmap: [[bool; WIDTH as usize]; HEIGHT as usize] =
 		[[false; WIDTH as usize]; HEIGHT as usize];
 	event_loop.run(move |event, _, control_flow| {
-		match event {
-			Event::MainEventsCleared => {
-				render(pixels.get_frame_mut(), &bitmap);
-				if let Err(err) = pixels.render() {
-					error!("pixels.render() failed: {err}");
-					*control_flow = ControlFlow::Exit;
-					return;
-				}
+		if event == Event::MainEventsCleared {
+			render(pixels.get_frame_mut(), &bitmap);
+			if let Err(err) = pixels.render() {
+				error!("pixels.render() failed: {err}");
+				*control_flow = ControlFlow::Exit;
+				return;
 			}
-			_ => {}
 		}
 
 		// Handle input events

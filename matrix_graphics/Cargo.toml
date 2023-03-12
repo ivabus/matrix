@@ -1,6 +1,6 @@
 [package]
 name = "matrix_graphics"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 
@@ -11,7 +11,7 @@ default = ["optimize"]
 [dependencies]
 env_logger = "0.10"
 log = "0.4"
-matrix = { version = "0.1.0", path = "../matrix" }
+matrix = { version = "0.1.2", path = "../matrix" }
 pixels = "0.11.0"
 winit = "0.28.1"
 winit_input_helper = "0.14.0"

@@ -1,5 +1,6 @@
-// use rand::{thread_rng, Rng};
 use std::ops::{Add, AddAssign, Mul, MulAssign};
+
+use rand::{thread_rng, Rng};
 
 pub(crate) type Matrix<T> = Vec<Vec<T>>;
 
@@ -63,9 +64,12 @@ pub fn mul<T: Mul<Output = T> + Copy + AddAssign + MulAssign + std::fmt::Display
 
 	Some(c)
 }
-/*
+
 #[allow(dead_code)]
-fn gen_matrix<T>(i: usize, j: usize) -> Option<Matrix<T>> {
+fn gen_matrix<T: Mul<Output = T> + Copy + AddAssign + MulAssign + std::fmt::Display + From<i32>>(
+	i: usize,
+	j: usize,
+) -> Option<Matrix<T>> {
 	if !(i > 0 && j > 0) {
 		return None;
 	}
@@ -76,7 +80,7 @@ fn gen_matrix<T>(i: usize, j: usize) -> Option<Matrix<T>> {
 	for a in 0..i {
 		m.push(vec![]);
 		for _ in 0..j {
-			m[a].push(rng.gen_range(0..100) as T);
+			m[a].push(T::from(rng.gen_range(0..100)));
 		}
 	}
 	Some(m)
@@ -84,8 +88,10 @@ fn gen_matrix<T>(i: usize, j: usize) -> Option<Matrix<T>> {
 
 #[cfg(test)]
 mod test {
-	use super::*;
 	use rand::{thread_rng, Rng};
+
+	use super::*;
+
 	#[test]
 	fn basic_sum() {
 		let a = vec![vec![1., 2.], vec![3., 4.]];
@@ -145,10 +151,6 @@ mod test {
 		let a: Matrix<f64> = gen_matrix(s1, s2).unwrap();
 		let b: Matrix<f64> = gen_matrix(s2, s3).unwrap();
 		let c: Matrix<f64> = gen_matrix(s3, s4).unwrap();
-		assert_eq!(
-			mul(&mul(&a, &b).unwrap(), &c).unwrap(),
-			mul(&a, &mul(&b, &c).unwrap()).unwrap()
-		)
+		assert_eq!(mul(&mul(&a, &b).unwrap(), &c).unwrap(), mul(&a, &mul(&b, &c).unwrap()).unwrap())
 	}
 }
-*/

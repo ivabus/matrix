@@ -14,7 +14,7 @@ mod structs;
 
 const WIDTH: u32 = 640;
 const HEIGHT: u32 = 480;
-const POLYGON: usize = 7;
+const POLYGON: usize = 4;
 // POLYGON >= 2
 const CENTER_X: u32 = 320;
 const CENTER_Y: u32 = 240;

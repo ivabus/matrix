@@ -48,8 +48,8 @@ impl Line {
 			vec![(self.end_x - self.rotate_center_x)],
 			vec![(self.end_y - self.rotate_center_y)],
 		];
-		let res_start = matrix::mult(&matrix_rotate, &matrix_start).unwrap();
-		let res_end = matrix::mult(&matrix_rotate, &matrix_end).unwrap();
+		let res_start = matrix::mul(&matrix_rotate, &matrix_start).unwrap();
+		let res_end = matrix::mul(&matrix_rotate, &matrix_end).unwrap();
 		(self.start_x, self.start_y) =
 			(res_start[0][0] + self.rotate_center_x, res_start[1][0] + self.rotate_center_y);
 		(self.end_x, self.end_y) =

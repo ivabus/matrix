@@ -1,3 +1,4 @@
 [workspace]
 members = ["matrix", "matrix_graphics"]
+default-members = ["matrix_graphics"]
 resolver = "2"

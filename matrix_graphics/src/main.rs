@@ -181,8 +181,8 @@ fn main() {
 				i.update();
 			}
 			bitmap = [[false; WIDTH as usize]; HEIGHT as usize];
-			for l in 0..objects.len() {
-				let current_dots = objects[l].get_points();
+			for object in &objects {
+				let current_dots = object.get_points();
 				for (x, y) in current_dots {
 					if x >= 0 && y >= 0 && x < WIDTH as isize && y < HEIGHT as isize {
 						bitmap[y as usize][x as usize] = true;

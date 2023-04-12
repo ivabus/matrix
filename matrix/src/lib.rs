@@ -65,6 +65,27 @@ pub fn mul<T: Mul<Output = T> + Copy + AddAssign + From<u8>>(
 	Some(c)
 }
 
+pub fn det<T: Mul<Output = T> + Copy + Add>(a: &Matrix<T>) -> Option<Matrix<T>> {
+	if ! check_valid(a) {
+		return None;
+	}
+	if a[0].len() != a.len() {
+		return None;
+	}
+	let j = 0;
+	for i in 1..n {
+		let _pre_minor: Matrix<T> = vec![&a[0..i], &a[i+1..]];
+		let mut pre_minor: Metrix<T> = vec![vec![]];
+		for m in _pre_minor {
+			if m == j {
+				continue;
+			}
+			pre_minor[m].push
+		}
+		let minor = det(&pre_minor);
+
+	}
+}
 #[allow(dead_code)]
 fn gen_matrix<T: From<i32>>(i: usize, j: usize) -> Option<Matrix<T>> {
 	if !(i > 0 && j > 0) {

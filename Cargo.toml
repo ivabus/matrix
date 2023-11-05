@@ -1,4 +1,4 @@
 [workspace]
-members = ["matrix", "matrix_graphics"]
+members = ["matrix", "matrix_graphics", "lin_sys"]
 default-members = ["matrix_graphics"]
 resolver = "2"

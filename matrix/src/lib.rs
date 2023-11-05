@@ -1,13 +1,110 @@
-use std::ops::{Add, AddAssign, Mul};
+#![recursion_limit = "32768"]
 
 use rand::{thread_rng, Rng};
+use std::cmp::Ord;
+use std::ops::{Add, AddAssign, Mul, Neg};
 
-pub(crate) type Matrix<T> = Vec<Vec<T>>;
+#[derive(Debug)]
+pub struct Matrix<
+	T: Mul<Output = T>
+		+ Copy
+		+ AddAssign
+		+ From<u8>
+		+ PartialEq
+		+ Add
+		+ PartialOrd
+		+ Ord
+		+ Copy
+		+ Neg<Output = T>,
+>(Vec<Vec<T>>);
 
-fn check_valid<T>(a: &Matrix<T>) -> bool {
-	let len = a[0].len();
+impl<
+		T: Mul<Output = T>
+			+ Copy
+			+ AddAssign
+			+ From<u8>
+			+ PartialEq
+			+ Add
+			+ PartialOrd
+			+ Ord
+			+ Copy
+			+ Neg<Output = T>,
+	> Matrix<T>
+{
+	fn len(&self) -> usize {
+		self.0.len()
+	}
 
-	for i in a {
+	fn push(&mut self, element: Vec<T>) {
+		self.0.push(element)
+	}
+
+	fn new() -> Matrix<T> {
+		Matrix(Vec::new())
+	}
+
+	pub fn dot(&self, other: &Matrix<T>) -> Option<Matrix<T>> {
+		if !(check_valid(self) && check_valid(other)) {
+			return None;
+		}
+
+		if self.0[0].len() != other.0.len() {
+			return None;
+		}
+
+		let m = self.0[0].len();
+		let mut c: Matrix<T> = Matrix::new();
+
+		for i in 0..self.len() {
+			c.push(vec![]);
+			for j in 0..other.0[0].len() {
+				let mut s: T = 0_u8.into();
+				for r in 0..m {
+					s += self.0[i][r] * other.0[r][j];
+				}
+				c.0[i].push(s as T);
+			}
+		}
+
+		Some(c)
+	}
+}
+
+impl<
+		T: Mul<Output = T>
+			+ Copy
+			+ AddAssign
+			+ From<u8>
+			+ PartialEq
+			+ Add
+			+ PartialOrd
+			+ Ord
+			+ Copy
+			+ Neg<Output = T>,
+	> PartialEq for Matrix<T>
+{
+	fn eq(&self, other: &Self) -> bool {
+		self.0 == other.0
+	}
+}
+
+fn check_valid<
+	T: Mul<Output = T>
+		+ Copy
+		+ AddAssign
+		+ From<u8>
+		+ PartialEq
+		+ Add
+		+ PartialOrd
+		+ Ord
+		+ Copy
+		+ Neg<Output = T>,
+>(
+	a: &Matrix<T>,
+) -> bool {
+	let len = a.0[0].len();
+
+	for i in &a.0 {
 		if i.len() != len {
 			return false;
 		}
@@ -16,7 +113,21 @@ fn check_valid<T>(a: &Matrix<T>) -> bool {
 	true
 }
 
-pub fn sum<T: Add<Output = T> + Copy>(a: &Matrix<T>, b: &Matrix<T>) -> Option<Matrix<T>> {
+pub fn sum<
+	T: Mul<Output = T>
+		+ Copy
+		+ AddAssign
+		+ From<u8>
+		+ PartialEq
+		+ Add
+		+ PartialOrd
+		+ Ord
+		+ Copy
+		+ Neg<Output = T>,
+>(
+	a: &Matrix<T>,
+	b: &Matrix<T>,
+) -> Option<Matrix<T>> {
 	if !(check_valid(a) && check_valid(b)) {
 		return None;
 	}
@@ -25,80 +136,114 @@ pub fn sum<T: Add<Output = T> + Copy>(a: &Matrix<T>, b: &Matrix<T>) -> Option<Ma
 		return None;
 	}
 
-	let mut c: Matrix<T> = Vec::new();
+	let mut c: Matrix<T> = Matrix::new();
 	for i in 0..a.len() {
 		c.push(vec![]);
-		for j in 0..a[0].len() {
-			c[i].push(a[i][j] + b[i][j]);
+		for j in 0..a.0[0].len() {
+			c.0[i].push(a.0[i][j] + b.0[i][j]);
 		}
 	}
 
 	Some(c)
 }
 
-pub fn mul<T: Mul<Output = T> + Copy + AddAssign + From<u8>>(
-	a: &Matrix<T>,
-	b: &Matrix<T>,
-) -> Option<Matrix<T>> {
-	if !(check_valid(a) && check_valid(b)) {
-		return None;
-	}
-
-	if a[0].len() != b.len() {
-		return None;
-	}
-
-	let m = a[0].len();
-	let mut c: Matrix<T> = Vec::new();
-
-	for i in 0..a.len() {
-		c.push(vec![]);
-		for j in 0..b[0].len() {
-			let mut s: T = 0_u8.into();
-			for r in 0..m {
-				s += a[i][r] * b[r][j];
-			}
-			c[i].push(s as T);
+fn get_minor<
+	T: Mul<Output = T>
+		+ Copy
+		+ AddAssign
+		+ From<u8>
+		+ PartialEq
+		+ Add
+		+ PartialOrd
+		+ Ord
+		+ Copy
+		+ Neg<Output = T>,
+>(
+	base: &&Matrix<T>,
+	mi: &usize,
+	mj: &usize,
+) -> Matrix<T> {
+	let mut minor: Matrix<T> = Matrix::new();
+	let mut offset: usize = 0;
+	for i in 0..base.len() {
+		if i == *mi {
+			offset += 1;
+			continue;
 		}
-	}
-
-	Some(c)
-}
-
-pub fn det<T: Mul<Output = T> + Copy + Add>(a: &Matrix<T>) -> Option<Matrix<T>> {
-	if ! check_valid(a) {
-		return None;
-	}
-	if a[0].len() != a.len() {
-		return None;
-	}
-	let j = 0;
-	for i in 1..n {
-		let _pre_minor: Matrix<T> = vec![&a[0..i], &a[i+1..]];
-		let mut pre_minor: Metrix<T> = vec![vec![]];
-		for m in _pre_minor {
-			if m == j {
+		minor.push(vec![]);
+		for j in 0..base.0[0].len() {
+			if j == *mj {
 				continue;
 			}
-			pre_minor[m].push
+			minor.0[i - offset].push(base.0[i][j])
 		}
-		let minor = det(&pre_minor);
-
 	}
+	minor
+}
+
+pub fn det<
+	T: Mul<Output = T>
+		+ Copy
+		+ AddAssign
+		+ From<u8>
+		+ PartialEq
+		+ Add
+		+ PartialOrd
+		+ Ord
+		+ Copy
+		+ Neg<Output = T>,
+>(
+	a: &Matrix<T>,
+) -> Option<T> {
+	if !check_valid(a) {
+		return None;
+	}
+	if a.0[0].len() != a.0.len() {
+		return None;
+	}
+	if a.0[0].len() == 1 {
+		return Some(a.0[0][0]);
+	}
+	let j = 1;
+	let mut determinant: T = 0.into();
+	for i in 0..a.len() {
+		let minor: T = det(&get_minor(&a, &i, &j)).unwrap();
+		determinant += if (i + 1) % 2 == 1 {
+			-Into::<T>::into(1i8)
+		} else {
+			Into::<T>::into(1i8)
+		} * a.0[i][1]
+			* minor;
+	}
+	Some(determinant)
 }
 #[allow(dead_code)]
-fn gen_matrix<T: From<i32>>(i: usize, j: usize) -> Option<Matrix<T>> {
+fn gen_matrix<
+	T: Mul<Output = T>
+		+ Copy
+		+ AddAssign
+		+ From<u8>
+		+ PartialEq
+		+ Add
+		+ PartialOrd
+		+ Ord
+		+ Copy
+		+ Neg<Output = T>,
+>(
+	i: usize,
+	j: usize,
+) -> Option<Matrix<T>> {
 	if !(i > 0 && j > 0) {
 		return None;
 	}
 
 	let mut rng = thread_rng();
-	let mut m: Matrix<T> = Vec::new();
+	let mut m: Matrix<T> = Matrix::new();
 
 	for a in 0..i {
 		m.push(vec![]);
 		for _ in 0..j {
-			m[a].push(T::from(rng.gen_range(0..100)));
+			m.0[a].push(T::from(rng.gen_range(0..100)));
 		}
 	}
 	Some(m)
@@ -114,14 +259,17 @@ mod test {
 	fn basic_sum() {
 		let a = vec![vec![1., 2.], vec![3., 4.]];
 		let b = vec![vec![5., 6.], vec![7., 8.]];
-		assert_eq!(sum(&a, &b).unwrap(), vec![vec![6., 8.], vec![10., 12.]])
+		assert_eq!(sum(&Matrix(a), &Matrix(b)).unwrap(), Matrix(vec![vec![6., 8.], vec![10., 12.]]))
 	}
 
 	#[test]
 	fn basic_mul() {
 		let a = vec![vec![3., -1., 2.], vec![4., 2., 0.], vec![-5., 6., 1.]];
 		let b = vec![vec![8., 1.], vec![7., 2.], vec![2., -3.]];
-		assert_eq!(mul(&a, &b).unwrap(), vec![vec![21., -5.], vec![46., 8.], vec![4., 4.]])
+		assert_eq!(
+			mul(&Matrix(a), &Matrix(b)).unwrap(),
+			Matrix(vec![vec![21., -5.], vec![46., 8.], vec![4., 4.]])
+		)
 	}
 
 	#[test]
@@ -134,13 +282,13 @@ mod test {
 	}
 
 	#[test]
-	#[ignore]
+	#[should_panic]
 	fn mv_mul() {
 		let a: Matrix<f64> = gen_matrix(10, 1).unwrap();
 		let b: Matrix<f64> = gen_matrix(1, 10).unwrap();
 		let ab = mul(&a, &b);
 		let ba = mul(&b, &a);
-		if ab != None && ba != None {
+		if ab.is_some() && ba.is_some() {
 			assert_eq!(ab.unwrap(), ba.unwrap())
 		} else {
 			assert!(false)
@@ -170,5 +318,35 @@ mod test {
 		let b: Matrix<f64> = gen_matrix(s2, s3).unwrap();
 		let c: Matrix<f64> = gen_matrix(s3, s4).unwrap();
 		assert_eq!(mul(&mul(&a, &b).unwrap(), &c).unwrap(), mul(&a, &mul(&b, &c).unwrap()).unwrap())
+	}
+
+	#[test]
+	fn basic_det_1() {
+		let matrix: Matrix<i32> = Matrix(vec![vec![1, -2, -2], vec![5, 1, 3], vec![8, 0, 4]]);
+		assert_eq!(det(&matrix).unwrap(), 12i32)
+	}
+	#[test]
+	fn basic_det_2() {
+		let matrix: Matrix<i32> =
+			Matrix(vec![vec![1, 0, 0, 0], vec![0, 3, 0, 0], vec![0, 0, 1, 0], vec![0, 0, 0, 1]]);
+		assert_eq!(det(&matrix).unwrap(), 3i32)
+	}
+	#[test]
+	fn basic_det_3() {
+		let matrix: Matrix<i32> =
+			Matrix(vec![vec![0, 0, 0, 1], vec![0, 1, 0, 0], vec![0, 0, 1, 0], vec![1, 0, 0, 0]]);
+		assert_eq!(det(&matrix).unwrap(), -1i32)
+	}
+	#[test]
+	fn basic_det_4() {
+		let matrix: Matrix<i32> =
+			Matrix(vec![vec![1, 0, 0, 7], vec![0, 1, 0, 0], vec![0, 0, 1, 0], vec![0, 0, 0, 1]]);
+		assert_eq!(det(&matrix).unwrap(), 1i32)
+	}
+	#[test]
+	fn basic_det_5() {
+		let matrix: Matrix<i32> =
+			Matrix(vec![vec![3, 0, 2, -1], vec![1, 2, 0, -2], vec![4, 0, 6, -3], vec![5, 0, 2, 0]]);
+		assert_eq!(det(&matrix).unwrap(), 20i32)
 	}
 }
